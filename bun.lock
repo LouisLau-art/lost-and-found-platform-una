@@ -14,15 +14,11 @@
         "vue": "^3.5.25",
       },
       "devDependencies": {
-        "@iconify-json/carbon": "^1.2.15",
-        "@iconify-json/lucide": "^1.2.81",
         "@iconify-json/ph": "latest",
         "@iconify-json/radix-icons": "^1.2.5",
-        "@iconify-json/tabler": "^1.2.24",
         "@nuxt/devtools": "^3.1.1",
         "@types/better-sqlite3": "^7.6.13",
         "@una-ui/nuxt": "^1.0.0-alpha.12",
-        "@unocss/preset-icons": "^66.5.10",
         "drizzle-kit": "^0.31.8",
         "typescript": "^5.9.3",
         "vue-tsc": "latest",
@@ -174,15 +170,9 @@
 
     "@huggingface/jinja": ["@huggingface/jinja@0.2.2", "https://registry.npmmirror.com/@huggingface/jinja/-/jinja-0.2.2.tgz", {}, "sha512-/KPde26khDUIPkTGU82jdtTW9UAuvUTumCAbFs/7giR0SxsvZC4hru51PBvpijH6BVkHcROcvZM/lpy5h1jRRA=="],
 
-    "@iconify-json/carbon": ["@iconify-json/carbon@1.2.15", "https://registry.npmmirror.com/@iconify-json/carbon/-/carbon-1.2.15.tgz", { "dependencies": { "@iconify/types": "*" } }, "sha512-9tW0nZY5QtKkMhuYzW09BM1345SyXNuA+gx2ub0j/fnfHOD5XVimMJ/D76H3tTez25NJbPYCLIQoFhvJc1HVBQ=="],
-
-    "@iconify-json/lucide": ["@iconify-json/lucide@1.2.81", "https://registry.npmmirror.com/@iconify-json/lucide/-/lucide-1.2.81.tgz", { "dependencies": { "@iconify/types": "*" } }, "sha512-6Kz/+SEuD5bkg0KImi0yFem9l6njKp4e1qF1LpQbgRfk7ngsJR/qjlB4y5rM8N1iKiDR/p19cqhmwZxyCWek+w=="],
-
     "@iconify-json/ph": ["@iconify-json/ph@1.2.2", "https://registry.npmmirror.com/@iconify-json/ph/-/ph-1.2.2.tgz", { "dependencies": { "@iconify/types": "*" } }, "sha512-PgkEZNtqa8hBGjHXQa4pMwZa93hmfu8FUSjs/nv4oUU6yLsgv+gh9nu28Kqi8Fz9CCVu4hj1MZs9/60J57IzFw=="],
 
     "@iconify-json/radix-icons": ["@iconify-json/radix-icons@1.2.5", "https://registry.npmmirror.com/@iconify-json/radix-icons/-/radix-icons-1.2.5.tgz", { "dependencies": { "@iconify/types": "*" } }, "sha512-HkUt+ydCivK/S/aFsgaiZRvs7zDEcO07PKkuEuu2EFBWCuC+Pi1mDdXPX0U3qjRr7JknmnoR4sAg53C+Ig35ow=="],
-
-    "@iconify-json/tabler": ["@iconify-json/tabler@1.2.24", "https://registry.npmmirror.com/@iconify-json/tabler/-/tabler-1.2.24.tgz", { "dependencies": { "@iconify/types": "*" } }, "sha512-W1GIC36ckaQvr0fpQeyqC62HWyF3/r0yjJHtCByZmxA3qTMqLv0wJDdz/BffnmoCMulaBbxgjbTptFfKyn5e/g=="],
 
     "@iconify/types": ["@iconify/types@2.0.0", "https://registry.npmmirror.com/@iconify/types/-/types-2.0.0.tgz", {}, "sha512-+wluvCrRhXrhyOmRDJ3q8mux9JkKy5SJ/v8ol2tu4FVjyYvtEzkc/3pK15ET6RKg4b4w4BmTk1+gsCUhf21Ykg=="],
 

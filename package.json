@@ -23,15 +23,11 @@
         "sharp": "^0.34.5"
     },
     "devDependencies": {
-        "@iconify-json/carbon": "^1.2.15",
-        "@iconify-json/lucide": "^1.2.81",
         "@iconify-json/ph": "latest",
         "@iconify-json/radix-icons": "^1.2.5",
-        "@iconify-json/tabler": "^1.2.24",
         "@nuxt/devtools": "^3.1.1",
         "@types/better-sqlite3": "^7.6.13",
         "@una-ui/nuxt": "^1.0.0-alpha.12",
-        "@unocss/preset-icons": "^66.5.10",
         "drizzle-kit": "^0.31.8",
         "typescript": "^5.9.3",
         "vue-tsc": "latest"
