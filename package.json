@@ -14,13 +14,12 @@
         "db:studio": "drizzle-kit studio"
     },
     "dependencies": {
-        "nuxt": "latest",
-        "@una-ui/nuxt": "latest",
-        "nuxt-auth-utils": "latest",
-        "drizzle-orm": "latest",
-        "better-sqlite3": "latest",
         "@xenova/transformers": "latest",
-        "bcrypt": "latest"
+        "bcrypt": "latest",
+        "better-sqlite3": "latest",
+        "drizzle-orm": "latest",
+        "nuxt": "latest",
+        "nuxt-auth-utils": "latest"
     },
     "devDependencies": {
         "@iconify-json/lucide": "^1.2.81",
