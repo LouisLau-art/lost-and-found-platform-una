@@ -1,0 +1,35 @@
+{
+    "name": "lost-and-found-nuxt",
+    "version": "1.0.0",
+    "private": true,
+    "type": "module",
+    "scripts": {
+        "build": "nuxt build",
+        "dev": "nuxt dev",
+        "generate": "nuxt generate",
+        "preview": "nuxt preview",
+        "postinstall": "nuxt prepare",
+        "db:generate": "drizzle-kit generate",
+        "db:push": "drizzle-kit push",
+        "db:studio": "drizzle-kit studio"
+    },
+    "dependencies": {
+        "nuxt": "latest",
+        "@una-ui/nuxt": "latest",
+        "nuxt-auth-utils": "latest",
+        "drizzle-orm": "latest",
+        "better-sqlite3": "latest",
+        "@xenova/transformers": "latest",
+        "bcrypt": "latest"
+    },
+    "devDependencies": {
+        "@iconify-json/lucide": "^1.2.81",
+        "@iconify-json/ph": "latest",
+        "@iconify-json/tabler": "^1.2.24",
+        "@types/bcrypt": "latest",
+        "@types/better-sqlite3": "latest",
+        "drizzle-kit": "latest",
+        "typescript": "latest",
+        "vue-tsc": "latest"
+    }
+}
