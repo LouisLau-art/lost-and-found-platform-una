@@ -15,7 +15,7 @@ async function handleSubmit() {
   if (!form.value.email || !form.value.password) {
     toast({ 
       title: '请填写邮箱和密码', 
-      toast: 'soft-yellow',
+      toast: 'soft-warning',
       leading: 'i-ph-warning-bold',
       closable: true 
     })
@@ -40,7 +40,7 @@ async function handleSubmit() {
     toast({ 
       title: '登录失败', 
       description: e.data?.message || '账号或密码错误', 
-      toast: 'soft-red',
+      toast: 'soft-error',
       leading: 'i-ph-warning-circle-bold',
       closable: true
     })
@@ -53,64 +53,59 @@ async function handleSubmit() {
 <template>
   <div class="max-w-md mx-auto py-12">
     <div class="text-center mb-8">
-      <div class="inline-flex items-center justify-center p-4 rounded-full bg-primary/10 text-primary mb-4">
+      <div class="inline-flex items-center justify-center p-4 rounded-full bg-$c-primary/10 text-$c-primary mb-4">
         <span class="i-ph-user-circle text-4xl" />
       </div>
       <h1 class="text-2xl font-bold">欢迎回来</h1>
       <p class="opacity-70">登录您的账号以继续</p>
     </div>
     
-    <div class="card bg-base-100 shadow-xl border border-base-300">
-      <div class="card-body">
-        <form @submit.prevent="handleSubmit" class="space-y-4">
-          <div class="form-control w-full">
-            <label class="label">
-              <span class="label-text">邮箱 <span class="text-error">*</span></span>
-            </label>
-            <div class="relative">
-              <input 
-                v-model="form.email" 
-                type="email" 
-                placeholder="name@example.com" 
-                class="input input-bordered w-full pl-10" 
-              />
-              <span class="i-ph-envelope absolute left-3 top-3 text-xl opacity-50" />
-            </div>
-          </div>
-
-          <div class="form-control w-full">
-            <label class="label">
-              <span class="label-text">密码 <span class="text-error">*</span></span>
-              <span class="label-text-alt">
-                <NuxtLink to="#" class="text-xs text-primary hover:underline">忘记密码?</NuxtLink>
-              </span>
-            </label>
-            <div class="relative">
-              <input 
-                v-model="form.password" 
-                type="password" 
-                placeholder="••••••••" 
-                class="input input-bordered w-full pl-10" 
-              />
-              <span class="i-ph-lock absolute left-3 top-3 text-xl opacity-50" />
-            </div>
-          </div>
-
-          <button 
-            type="submit" 
-            class="btn btn-primary w-full mt-2 btn-lg"
-            :class="{ 'loading': isSubmitting }"
-            :disabled="isSubmitting"
-          >
-            登录
-          </button>
-        </form>
-
-        <div class="mt-6 pt-6 border-t border-base-300 text-center text-sm opacity-70">
-          还没有账号？
-          <NuxtLink to="/register" class="text-primary font-medium hover:underline">立即注册</NuxtLink>
+    <NCard card="outline" class="shadow-xl">
+      <form @submit.prevent="handleSubmit" class="space-y-4">
+        <div class="space-y-2">
+          <NLabel for="email">邮箱 <span class="text-red-500">*</span></NLabel>
+          <NInput 
+            id="email"
+            v-model="form.email" 
+            type="email" 
+            placeholder="name@example.com" 
+            leading="i-ph-envelope"
+          />
         </div>
-      </div>
-    </div>
+
+        <div class="space-y-2">
+          <div class="flex items-center justify-between">
+            <NLabel for="password">密码 <span class="text-red-500">*</span></NLabel>
+            <NuxtLink to="#" class="text-xs text-$c-primary hover:underline">忘记密码?</NuxtLink>
+          </div>
+          <NInput 
+            id="password"
+            v-model="form.password" 
+            type="password" 
+            placeholder="••••••••" 
+            leading="i-ph-lock"
+          />
+        </div>
+
+        <NButton 
+          type="submit" 
+          btn="solid-primary"
+          block
+          size="lg"
+          :loading="isSubmitting"
+          :disabled="isSubmitting"
+          class="mt-4"
+        >
+          登录
+        </NButton>
+      </form>
+
+      <template #footer>
+        <div class="text-center text-sm opacity-70 pt-4 border-t border-$c-divider">
+          还没有账号？
+          <NuxtLink to="/register" class="text-$c-primary font-medium hover:underline">立即注册</NuxtLink>
+        </div>
+      </template>
+    </NCard>
   </div>
 </template>

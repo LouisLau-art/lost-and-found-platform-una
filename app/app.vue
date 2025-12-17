@@ -11,15 +11,19 @@ useHead({
 </script>
 
 <template>
-  <div>
+  <div class="min-h-screen bg-$c-bg text-$c-fg antialiased">
     <NuxtLayout>
       <NuxtPage />
     </NuxtLayout>
+    
+    <!-- Una UI Toaster - automatically handles toast notifications -->
+    <NToaster />
   </div>
 </template>
 
 <style>
+/* Global styles using Una UI CSS variables */
 body {
-  @apply bg-base-100 text-base-content antialiased;
+  font-family: Inter, sans-serif;
 }
 </style>

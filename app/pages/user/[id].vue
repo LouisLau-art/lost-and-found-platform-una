@@ -10,7 +10,6 @@ const isOwnProfile = computed(() => userId === session.value?.user?.id)
 
 // Fetch user data with error handling
 const { data: userData, error: userError } = await useFetch(`/api/users/${userId}`, {
-  // Don't throw on error, handle it in template
   server: true,
   lazy: false
 })
@@ -20,7 +19,6 @@ const user = computed(() => userData.value)
 // User's posts
 const { data: postsData } = await useFetch('/api/posts', {
   query: { authorId: String(userId), limit: '50' },
-  // Only fetch if user exists
   immediate: !!userData.value
 })
 const posts = computed(() => postsData.value?.data || [])
@@ -39,12 +37,16 @@ const stats = computed(() => ({
 
 const activeTab = ref('posts')
 
-// Debug log
-if (process.client) {
-  console.log('User ID:', userId)
-  console.log('User Data:', userData.value)
-  console.log('User Error:', userError.value)
-}
+// Tab items
+const tabItems = computed(() => {
+  const items = [
+    { value: 'posts', label: `发布记录 (${posts.value.length})`, content: 'posts' }
+  ]
+  if (isOwnProfile.value) {
+    items.push({ value: 'claims', label: `认领记录 (${claims.value.length})`, content: 'claims' })
+  }
+  return items
+})
 </script>
 
 <template>
@@ -54,115 +56,86 @@ if (process.client) {
       <div class="i-ph-user-circle-x text-6xl opacity-30 mx-auto mb-4" />
       <h2 class="text-2xl font-bold mb-2">用户不存在</h2>
       <p class="opacity-70 mb-6">该用户可能已被删除或不存在</p>
-      <NuxtLink to="/" class="btn btn-primary">返回首页</NuxtLink>
+      <NButton to="/" btn="solid-primary">返回首页</NButton>
     </div>
 
     <!-- User Profile -->
     <div v-else class="space-y-8">
       <!-- Profile Header -->
-      <div class="card bg-base-100 shadow-xl border border-base-300">
-        <div class="card-body">
-          <div class="flex flex-col md:flex-row items-start md:items-center gap-6">
-            <!-- Avatar -->
-            <div class="avatar">
-              <div class="w-24 rounded-full ring ring-primary ring-offset-base-100 ring-offset-2">
-                <img v-if="user.avatar" :src="user.avatar" :alt="user.name" />
-                <div v-else class="bg-neutral text-neutral-content flex items-center justify-center text-4xl">
-                  {{ user.name?.[0] }}
-                </div>
-              </div>
-            </div>
+      <NCard card="outline" class="shadow-xl">
+        <div class="flex flex-col md:flex-row items-start md:items-center gap-6">
+          <!-- Avatar -->
+          <NAvatar 
+            :src="user.avatar"
+            :alt="user.name"
+            :label="user.name?.[0]"
+            size="xl"
+            class="w-24 h-24 ring-2 ring-$c-primary ring-offset-2 ring-offset-$c-bg"
+          />
 
-            <!-- User Info -->
-            <div class="flex-1">
-              <div class="flex items-center gap-3 mb-2">
-                <h1 class="text-3xl font-bold">{{ user.name }}</h1>
-                <div v-if="user.isAdmin" class="badge badge-error gap-1">
-                  <span class="i-ph-shield-check-fill" />
-                  管理员
-                </div>
-              </div>
-              <p class="text-lg opacity-70 mb-3">@{{ user.username }}</p>
-              
-              <!-- Stats -->
-              <div class="flex flex-wrap gap-4">
-                <div class="stat bg-base-200 rounded-lg p-4 min-w-[120px]">
-                  <div class="stat-title text-xs">信用分</div>
-                  <div class="stat-value text-2xl flex items-center gap-2">
-                    <span class="i-ph-star-fill text-warning" />
-                    {{ user.creditScore }}
-                  </div>
-                </div>
-                <div class="stat bg-base-200 rounded-lg p-4 min-w-[120px]">
-                  <div class="stat-title text-xs">发布</div>
-                  <div class="stat-value text-2xl">{{ stats.totalPosts }}</div>
-                  <div class="stat-desc">{{ stats.resolvedPosts }} 已解决</div>
-                </div>
-                <div v-if="isOwnProfile" class="stat bg-base-200 rounded-lg p-4 min-w-[120px]">
-                  <div class="stat-title text-xs">认领</div>
-                  <div class="stat-value text-2xl">{{ stats.totalClaims }}</div>
-                  <div class="stat-desc">{{ stats.approvedClaims }} 已通过</div>
-                </div>
-              </div>
+          <!-- User Info -->
+          <div class="flex-1">
+            <div class="flex items-center gap-3 mb-2">
+              <h1 class="text-3xl font-bold">{{ user.name }}</h1>
+              <NBadge v-if="user.isAdmin" badge="solid-error" leading="i-ph-shield-check-fill">
+                管理员
+              </NBadge>
             </div>
+            <p class="text-lg opacity-70 mb-3">@{{ user.username }}</p>
+            
+            <!-- Stats -->
+            <div class="flex flex-wrap gap-4">
+              <NCard card="soft" class="p-4 min-w-[120px]">
+                <div class="text-xs opacity-70">信用分</div>
+                <div class="text-2xl font-bold flex items-center gap-2">
+                  <span class="i-ph-star-fill text-yellow-500" />
+                  {{ user.creditScore }}
+                </div>
+              </NCard>
+              <NCard card="soft" class="p-4 min-w-[120px]">
+                <div class="text-xs opacity-70">发布</div>
+                <div class="text-2xl font-bold">{{ stats.totalPosts }}</div>
+                <div class="text-xs opacity-50">{{ stats.resolvedPosts }} 已解决</div>
+              </NCard>
+              <NCard v-if="isOwnProfile" card="soft" class="p-4 min-w-[120px]">
+                <div class="text-xs opacity-70">认领</div>
+                <div class="text-2xl font-bold">{{ stats.totalClaims }}</div>
+                <div class="text-xs opacity-50">{{ stats.approvedClaims }} 已通过</div>
+              </NCard>
+            </div>
+          </div>
 
-            <!-- Actions -->
-            <div v-if="isOwnProfile" class="flex flex-col gap-2">
-              <NuxtLink to="/profile" class="btn btn-outline btn-sm">
-                <span class="i-ph-gear" />
-                编辑资料
-              </NuxtLink>
-            </div>
+          <!-- Actions -->
+          <div v-if="isOwnProfile" class="flex flex-col gap-2">
+            <NButton to="/profile" btn="outline" size="sm" leading="i-ph-gear">
+              编辑资料
+            </NButton>
           </div>
         </div>
-      </div>
+      </NCard>
 
       <!-- Tabs -->
-      <div class="card bg-base-100 shadow-xl border border-base-300">
-        <div class="card-body">
-          <!-- Tab Headers -->
-          <div role="tablist" class="tabs tabs-bordered">
-            <a 
-              role="tab" 
-              class="tab tab-lg" 
-              :class="{ 'tab-active': activeTab === 'posts' }" 
-              @click="activeTab = 'posts'"
-            >
-              <span class="i-ph-newspaper mr-2" />
-              发布记录 ({{ posts.length }})
-            </a>
-            <a 
-              v-if="isOwnProfile"
-              role="tab" 
-              class="tab tab-lg" 
-              :class="{ 'tab-active': activeTab === 'claims' }" 
-              @click="activeTab = 'claims'"
-            >
-              <span class="i-ph-hand-pointing mr-2" />
-              认领记录 ({{ claims.length }})
-            </a>
-          </div>
-
-          <!-- Tab Content -->
-          <div class="mt-6">
+      <NCard card="outline" class="shadow-xl">
+        <NTabs v-model="activeTab" :items="tabItems">
+          <template #content="{ value }">
             <!-- Posts Tab -->
-            <div v-if="activeTab === 'posts'" class="space-y-4">
+            <div v-if="value === 'posts'" class="space-y-4 mt-6">
               <div v-if="posts.length" class="grid gap-4">
                 <NuxtLink
                   v-for="post in posts"
                   :key="post.id"
                   :to="`/post/${post.id}`"
-                  class="group flex items-center justify-between p-4 rounded-lg border border-base-300 bg-base-100 hover:border-primary/50 hover:shadow-md transition-all"
+                  class="group flex items-center justify-between p-4 rounded-lg border border-$c-divider bg-$c-bg hover:border-$c-primary/50 hover:shadow-md transition-all"
                 >
                   <div class="flex items-center gap-4 flex-1 min-w-0">
                     <div 
                       class="flex h-12 w-12 items-center justify-center rounded-full flex-shrink-0"
-                      :class="post.itemType === 'lost' ? 'bg-warning/10 text-warning' : 'bg-success/10 text-success'"
+                      :class="post.itemType === 'lost' ? 'bg-yellow-500/10 text-yellow-600' : 'bg-green-500/10 text-green-600'"
                     >
                       <span :class="post.itemType === 'lost' ? 'i-ph-magnifying-glass-bold text-xl' : 'i-ph-hand-heart-bold text-xl'" />
                     </div>
                     <div class="flex-1 min-w-0">
-                      <h3 class="font-bold text-lg group-hover:text-primary transition-colors truncate">
+                      <h3 class="font-bold text-lg group-hover:text-$c-primary transition-colors truncate">
                         {{ post.title }}
                       </h3>
                       <div class="flex items-center gap-3 text-sm opacity-70 mt-1">
@@ -183,56 +156,54 @@ if (process.client) {
                     </div>
                   </div>
                   <div class="flex items-center gap-3 flex-shrink-0">
-                    <div 
-                      class="badge" 
-                      :class="post.status === 'resolved' ? 'badge-success' : post.status === 'closed' ? 'badge-error' : 'badge-ghost'"
+                    <NBadge 
+                      :badge="post.status === 'resolved' ? 'soft-success' : post.status === 'closed' ? 'soft-error' : 'soft'"
                     >
                       {{ post.status === 'resolved' ? '已解决' : post.status === 'closed' ? '已关闭' : '进行中' }}
-                    </div>
+                    </NBadge>
                     <span class="i-ph-caret-right opacity-50" />
                   </div>
                 </NuxtLink>
               </div>
-              <div v-else class="text-center py-12 border border-dashed border-base-300 rounded-xl">
+              <div v-else class="text-center py-12 border border-dashed border-$c-divider rounded-xl">
                 <div class="i-ph-notebook text-4xl opacity-30 mx-auto mb-3" />
                 <p class="opacity-70">{{ isOwnProfile ? '你还没有发布任何帖子' : '该用户还没有发布任何帖子' }}</p>
-                <NuxtLink v-if="isOwnProfile" to="/post/new" class="btn btn-primary mt-4">立即发布</NuxtLink>
+                <NButton v-if="isOwnProfile" to="/post/new" btn="solid-primary" class="mt-4">立即发布</NButton>
               </div>
             </div>
 
             <!-- Claims Tab (Own Profile Only) -->
-            <div v-if="activeTab === 'claims' && isOwnProfile">
+            <div v-if="value === 'claims' && isOwnProfile" class="mt-6">
               <div v-if="claims.length" class="grid gap-4">
-                <div
+                <NCard
                   v-for="claim in claims"
                   :key="claim.id"
-                  class="p-4 rounded-lg border border-base-300 bg-base-100"
+                  card="outline"
                 >
                   <div class="flex justify-between items-start mb-2">
                     <div class="font-medium">申请认领: {{ claim.postTitle }}</div>
-                    <div 
-                      class="badge" 
-                      :class="claim.status === 'approved' ? 'badge-success' : claim.status === 'rejected' ? 'badge-error' : 'badge-warning'"
+                    <NBadge 
+                      :badge="claim.status === 'approved' ? 'soft-success' : claim.status === 'rejected' ? 'soft-error' : 'soft-warning'"
                     >
                       {{ claim.status === 'approved' ? '已通过' : claim.status === 'rejected' ? '已拒绝' : '审核中' }}
-                    </div>
+                    </NBadge>
                   </div>
-                  <p class="text-sm opacity-70 bg-base-200 p-3 rounded">
+                  <p class="text-sm opacity-70 bg-$c-muted p-3 rounded">
                     "{{ claim.message }}"
                   </p>
                   <div class="text-xs opacity-50 mt-2 text-right">
                     {{ new Date(claim.createdAt).toLocaleString('zh-CN') }}
                   </div>
-                </div>
+                </NCard>
               </div>
-              <div v-else class="text-center py-12 border border-dashed border-base-300 rounded-xl">
+              <div v-else class="text-center py-12 border border-dashed border-$c-divider rounded-xl">
                 <div class="i-ph-hand-pointing text-4xl opacity-30 mx-auto mb-3" />
                 <p class="opacity-70">暂无认领记录</p>
               </div>
             </div>
-          </div>
-        </div>
-      </div>
+          </template>
+        </NTabs>
+      </NCard>
     </div>
   </div>
 </template>

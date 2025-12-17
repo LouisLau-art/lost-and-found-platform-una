@@ -13,7 +13,7 @@ if (isLoggedIn.value) {
   unreadCount.value = notifData.value?.data?.filter((n: any) => n.status === 'unread').length || 0
   
   // Setup SSE for real-time notifications
-  if (process.client) {
+  if (import.meta.client) {
     const eventSource = new EventSource('/api/notifications/stream')
     eventSource.onmessage = (event) => {
       const data = JSON.parse(event.data)
@@ -36,102 +36,118 @@ async function handleLogout() {
 }
 
 function toggleColorMode() {
-  colorMode.preference.value = colorMode.preference.value === 'dark' ? 'light' : 'dark'
+  colorMode.preference = colorMode.value === 'dark' ? 'light' : 'dark'
 }
+
+// Dropdown menu items for user
+const userMenuItems = computed(() => [
+  {
+    label: '个人中心',
+    icon: 'i-ph-user-circle',
+    to: '/profile'
+  },
+  {
+    label: '退出登录',
+    icon: 'i-ph-sign-out',
+    click: handleLogout,
+    class: 'text-red-500'
+  }
+])
 </script>
 
 <template>
-  <div class="min-h-screen bg-base-100 transition-colors duration-300 flex flex-col">
+  <div class="min-h-screen bg-$c-bg transition-colors duration-300 flex flex-col">
     <!-- Header -->
-    <header class="sticky top-0 z-50 border-b border-base-300 bg-base-100/80 backdrop-blur">
+    <header class="sticky top-0 z-50 border-b border-$c-divider bg-$c-bg/80 backdrop-blur">
       <div class="container mx-auto flex h-16 items-center justify-between px-4">
         <!-- Logo -->
-        <NuxtLink to="/" class="flex items-center gap-2 text-xl font-bold text-primary transition hover:opacity-80">
+        <NuxtLink to="/" class="flex items-center gap-2 text-xl font-bold text-$c-primary transition hover:opacity-80">
           <span class="i-ph-magnifying-glass-bold text-2xl" />
           <span>失物招领</span>
         </NuxtLink>
         
         <!-- Navigation -->
         <nav class="flex items-center gap-2 md:gap-3">
-          <NuxtLink 
+          <NButton 
             to="/post/new" 
-            class="btn btn-primary btn-sm hidden sm:flex gap-1">
-            <span class="i-ph-plus-bold" />
+            btn="solid-primary"
+            size="sm"
+            leading="i-ph-plus-bold"
+            class="hidden sm:flex"
+          >
             发布
-          </NuxtLink>
+          </NButton>
           
           <!-- Mobile Publish Icon -->
-          <NuxtLink 
+          <NButton 
             to="/post/new" 
-            class="btn btn-primary btn-sm btn-square sm:hidden">
-            <span class="i-ph-plus-bold" />
-          </NuxtLink>
+            btn="solid-primary"
+            size="sm"
+            square
+            icon
+            leading="i-ph-plus-bold"
+            class="sm:hidden"
+          />
 
           <template v-if="isLoggedIn">
             <!-- Notifications -->
-            <div class="tooltip tooltip-bottom" data-tip="消息通知">
-              <NuxtLink to="/notifications" class="btn btn-ghost btn-sm btn-square indicator">
-                <span v-if="unreadCount > 0" class="indicator-item badge badge-error badge-sm text-xs">{{ unreadCount > 99 ? '99+' : unreadCount }}</span>
-                <span class="i-ph-bell text-xl" />
-              </NuxtLink>
-            </div>
+            <NTooltip content="消息通知">
+              <NIndicator 
+                :visible="unreadCount > 0" 
+                :label="unreadCount > 99 ? '99+' : String(unreadCount)"
+                indicator="solid-red"
+                size="xs"
+              >
+                <NButton 
+                  to="/notifications" 
+                  btn="ghost"
+                  size="sm"
+                  square
+                  icon
+                  leading="i-ph-bell"
+                />
+              </NIndicator>
+            </NTooltip>
             
             <!-- User Dropdown -->
-            <div class="dropdown dropdown-end">
-              <label tabindex="0" class="btn btn-ghost btn-sm gap-2 px-2 cursor-pointer">
-                <div class="avatar">
-                  <div class="w-6 rounded-full">
-                    <img 
-                      v-if="session?.user?.avatar"
-                      :src="session.user.avatar" 
-                      :alt="session.user.name" />
-                    <div v-else class="bg-primary text-primary-content flex items-center justify-center">
-                      <span class="i-ph-user" />
-                    </div>
-                  </div>
-                </div>
-                <span class="hidden sm:inline">{{ session?.user?.name }}</span>
-                <span class="i-ph-caret-down text-xs opacity-70" />
-              </label>
-              <ul tabindex="0" class="dropdown-content z-[100] menu p-2 shadow-xl bg-base-100/95 backdrop-blur-md rounded-box w-52 mt-2 border border-base-300">
-                <li class="menu-title">
-                  <span>我的账户</span>
-                </li>
-                <li>
-                  <NuxtLink to="/profile">
-                    <span class="i-ph-user-circle" />
-                    个人中心
-                  </NuxtLink>
-                </li>
-                <div class="divider my-0"></div>
-                <li>
-                  <a @click="handleLogout" class="text-error">
-                    <span class="i-ph-sign-out" />
-                    退出登录
-                  </a>
-                </li>
-              </ul>
-            </div>
+            <NDropdownMenu :items="userMenuItems">
+              <template #trigger>
+                <NButton btn="ghost" size="sm" class="gap-2 px-2">
+                  <NAvatar 
+                    :src="session?.user?.avatar" 
+                    :alt="session?.user?.name"
+                    :label="session?.user?.name?.[0]"
+                    size="xs"
+                    avatar="soft-primary"
+                  />
+                  <span class="hidden sm:inline">{{ session?.user?.name }}</span>
+                  <span class="i-ph-caret-down text-xs opacity-70" />
+                </NButton>
+              </template>
+            </NDropdownMenu>
           </template>
           
           <template v-else>
             <div class="flex items-center gap-2">
-              <NuxtLink to="/login" class="btn btn-ghost btn-sm">登录</NuxtLink>
-              <NuxtLink to="/register" class="btn btn-outline btn-sm">注册</NuxtLink>
+              <NButton to="/login" btn="ghost" size="sm">登录</NButton>
+              <NButton to="/register" btn="outline" size="sm">注册</NButton>
             </div>
           </template>
 
-          <div class="w-px h-6 bg-base-300 mx-1"></div>
+          <NSeparator orientation="vertical" class="h-6 mx-1" />
 
           <!-- Theme toggle -->
           <ClientOnly>
-            <div class="tooltip tooltip-bottom" :data-tip="colorMode.preference.value === 'dark' ? '切换亮色模式' : '切换暗色模式'">
-              <button
-                class="btn btn-ghost btn-sm btn-square"
-                @click="toggleColorMode">
-                <span :class="colorMode.preference.value === 'dark' ? 'i-ph-moon-bold' : 'i-ph-sun-bold'" class="text-xl" />
-              </button>
-            </div>
+            <NTooltip :content="colorMode.value === 'dark' ? '切换亮色模式' : '切换暗色模式'">
+              <NButton
+                btn="ghost"
+                size="sm"
+                square
+                icon
+                :leading="colorMode.value === 'dark' ? 'i-ph-moon-bold' : 'i-ph-sun-bold'"
+                @click="toggleColorMode"
+              />
+            </NTooltip>
           </ClientOnly>
         </nav>
       </div>
@@ -143,17 +159,14 @@ function toggleColorMode() {
     </main>
 
     <!-- Footer -->
-    <footer class="border-t border-base-300 py-8 mt-auto bg-base-200/50">
+    <footer class="border-t border-$c-divider py-8 mt-auto bg-$c-muted/50">
       <div class="container mx-auto px-4 text-center opacity-70 text-sm">
         <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
           <p>&copy; 2025 校园失物招领平台</p>
           <span class="hidden sm:inline opacity-30">|</span>
-          <p>Built with Nuxt + DaisyUI</p>
+          <p>Built with Nuxt + Una UI</p>
         </div>
       </div>
     </footer>
-    
-    <!-- Toast Notifications -->
-    <AppToast />
   </div>
 </template>

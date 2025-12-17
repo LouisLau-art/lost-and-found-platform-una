@@ -8,14 +8,18 @@ export default defineNuxtConfig({
   // Enable devtools
   devtools: { enabled: true },
 
-  // Modules
+  // Modules - @una-ui/nuxt includes UnoCSS and Color Mode
   modules: [
-    '@unocss/nuxt',
+    '@una-ui/nuxt',
     'nuxt-auth-utils',
   ],
 
-  // CSS reset for DaisyUI
-  css: ['@unocss/reset/tailwind.css'],
+  // Una UI configuration
+  una: {
+    prefix: 'N', // All components will be prefixed with N, e.g. NButton
+    themeable: true,
+    global: true, // Register components globally
+  },
 
   // Nitro configuration for server
   nitro: {

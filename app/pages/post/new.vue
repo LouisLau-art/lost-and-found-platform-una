@@ -16,7 +16,7 @@ const form = ref({
   content: '',
   location: '',
   contactInfo: session.value?.user?.email || '',
-  categoryId: undefined,
+  categoryId: undefined as string | undefined,
 })
 
 const { data: categories } = await useFetch('/api/categories-simple')
@@ -70,7 +70,6 @@ async function handleFileSelect(event: Event) {
        title: '正在进行AI视觉分析...',
        description: file.size > 500000 ? '压缩中...' : '提取图片特征中',
        toast: 'soft-info',
-       duration: 5000
     })
 
     const result = await $fetch<{ success: boolean; embedding?: number[]; tags?: string[]; warning?: string }>('/api/upload/analyze', {
@@ -116,7 +115,7 @@ async function handleSubmit() {
   if (!session.value?.user) {
     toast({
       title: '请先登录',
-      toast: 'soft-yellow',
+      toast: 'soft-warning',
       leading: 'i-ph-warning-bold',
       closable: true
     })
@@ -127,7 +126,7 @@ async function handleSubmit() {
   if (!form.value.title || !form.value.content) {
     toast({
       title: '请填写标题和描述',
-      toast: 'soft-yellow',
+      toast: 'soft-warning',
       leading: 'i-ph-warning-bold',
       closable: true
     })
@@ -146,8 +145,6 @@ async function handleSubmit() {
         location: form.value.location || null,
         contactInfo: form.value.contactInfo || null,
         categoryId: form.value.categoryId ? Number(form.value.categoryId) : null,
-
-
         images: imagePreview.value ? [imagePreview.value] : [],
         imageEmbedding: imageEmbedding.value,
         imageTags: imageTags.value.length > 0 ? imageTags.value.join(',') : null,
@@ -170,15 +167,21 @@ async function handleSubmit() {
     toast({
       title: '发布失败',
       description: e.data?.message || e.message || '未知错误',
-      toast: 'soft-red',
+      toast: 'soft-error',
       leading: 'i-ph-warning-circle-bold',
       closable: true
     })
-    isSubmitting.value = false // Only reset on error. On success, keep it true until navigation completes
+    isSubmitting.value = false
   }
-  // Remove finally block to prevent blinking if we are navigating away
 }
 
+// Category items for select
+const categoryItems = computed(() => 
+  (categories.value as any[] || []).map(cat => ({
+    label: cat.name,
+    value: String(cat.id)
+  }))
+)
 </script>
 
 <template>
@@ -189,22 +192,26 @@ async function handleSubmit() {
     </div>
 
     <!-- Login prompt -->
-    <div v-if="!session?.user" role="alert" class="alert alert-warning mb-6">
-      <span class="i-ph-info text-xl"></span>
-      <div>
-        <h3 class="font-bold">请先登录</h3>
-        <div class="text-xs">您需要登录后才能发布信息</div>
-      </div>
-      <NuxtLink to="/login" class="btn btn-sm">去登录</NuxtLink>
-    </div>
+    <NAlert 
+      v-if="!session?.user" 
+      alert="soft-warning"
+      title="请先登录"
+      description="您需要登录后才能发布信息"
+      icon="i-ph-info"
+      class="mb-6"
+    >
+      <template #default>
+        <NButton to="/login" size="sm" btn="solid-warning" class="mt-2">去登录</NButton>
+      </template>
+    </NAlert>
 
     <!-- Type Selector -->
     <div class="grid grid-cols-2 gap-4 mb-8">
       <div
         class="cursor-pointer rounded-xl border-2 p-6 text-center transition-all hover:scale-[1.02]"
         :class="form.type === 'lost' 
-          ? 'border-warning bg-warning text-warning-content shadow-lg scale-[1.02]' 
-          : 'border-base-300 hover:border-warning/50 hover:bg-warning/5'"
+          ? 'border-yellow-500 bg-yellow-500 text-white shadow-lg scale-[1.02]' 
+          : 'border-$c-divider hover:border-yellow-500/50 hover:bg-yellow-500/5'"
         @click="form.type = 'lost'"
       >
         <div class="i-ph-magnifying-glass-bold text-4xl mx-auto mb-3" />
@@ -214,8 +221,8 @@ async function handleSubmit() {
       <div
         class="cursor-pointer rounded-xl border-2 p-6 text-center transition-all hover:scale-[1.02]"
         :class="form.type === 'found' 
-          ? 'border-success bg-success text-success-content shadow-lg scale-[1.02]' 
-          : 'border-base-300 hover:border-success/50 hover:bg-success/5'"
+          ? 'border-green-500 bg-green-500 text-white shadow-lg scale-[1.02]' 
+          : 'border-$c-divider hover:border-green-500/50 hover:bg-green-500/5'"
         @click="form.type = 'found'"
       >
         <div class="i-ph-hand-heart-bold text-4xl mx-auto mb-3" />
@@ -225,132 +232,119 @@ async function handleSubmit() {
     </div>
 
     <!-- Form in Card -->
-    <div class="card bg-base-100 shadow-xl border border-base-300">
-      <div class="card-body">
-        <form @submit.prevent="handleSubmit" class="space-y-6">
+    <NCard card="outline" class="shadow-xl">
+      <form @submit.prevent="handleSubmit" class="space-y-6">
 
-          <!-- Image Upload -->
-          <div class="form-control w-full">
-            <label class="label">
-              <span class="label-text">物品图片</span>
-              <span class="label-text-alt opacity-70">支持上传一张图片，帮助辨认</span>
-            </label>
-            <div class="space-y-3">
-              <input 
-                type="file" 
-                accept="image/*"
-                class="file-input file-input-bordered w-full" 
-                @change="handleFileSelect"
-              />
-
-              <div v-if="imagePreview" class="relative w-full h-48 rounded-lg overflow-hidden border border-base-300 group">
-                <img :src="imagePreview" class="w-full h-full object-cover" />
-                <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                   <button type="button" class="btn btn-error btn-sm gap-2" @click="removeImage">
-                     <span class="i-ph-trash" />
-                     移除图片
-                   </button>
-                </div>
-              </div>
-              
-              <!-- AI Tags Display -->
-              <div v-if="imageTags.length > 0" class="flex flex-wrap gap-2 mt-2">
-                 <div class="badge badge-primary gap-1" v-for="tag in imageTags" :key="tag">
-                    <span class="i-ph-tag-simple"></span>
-                    {{ tag }}
-                 </div>
-              </div>
-              </div>
-            </div>
-
-
-          <!-- Title -->
-          <div class="form-control w-full">
-            <label class="label">
-              <span class="label-text">标题 <span class="text-error">*</span></span>
-            </label>
+        <!-- Image Upload -->
+        <div class="space-y-2">
+          <div class="flex items-center justify-between">
+            <NLabel>物品图片</NLabel>
+            <span class="text-xs opacity-70">支持上传一张图片，帮助辨认</span>
+          </div>
+          <div class="space-y-3">
             <input 
-              v-model="form.title" 
-              type="text" 
-              :placeholder="titlePlaceholder" 
-              class="input input-bordered w-full input-lg" 
+              ref="fileInput"
+              type="file" 
+              accept="image/*"
+              class="block w-full text-sm file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-$c-primary file:text-white file:cursor-pointer hover:file:bg-$c-primary/80 border border-$c-divider rounded-lg p-2" 
+              @change="handleFileSelect"
             />
-          </div>
 
-          <!-- Category -->
-          <div class="form-control w-full">
-            <label class="label">
-              <span class="label-text">分类</span>
-            </label>
-            <select v-model="form.categoryId" class="select select-bordered w-full">
-              <option disabled :value="undefined">选择物品分类</option>
-              <option 
-                v-for="cat in (categories as any[])" 
-                :key="cat.id" 
-                :value="String(cat.id)"
-              >
-                {{ cat.name }}
-              </option>
-            </select>
-          </div>
-
-          <!-- Content -->
-          <div class="form-control w-full">
-            <label class="label">
-              <span class="label-text">详细描述 <span class="text-error">*</span></span>
-            </label>
-            <textarea 
-              v-model="form.content"
-              :placeholder="contentPlaceholder"
-              class="textarea textarea-bordered h-32"
-            ></textarea>
-          </div>
-
-          <!-- Location -->
-          <div class="form-control w-full">
-            <label class="label">
-              <span class="label-text">地点</span>
-            </label>
-            <div class="relative">
-              <input 
-                v-model="form.location"
-                type="text"
-                placeholder="例如：图书馆三楼"
-                class="input input-bordered w-full pl-10"
-              />
-              <span class="i-ph-map-pin absolute left-3 top-3 text-xl opacity-50" />
+            <div v-if="imagePreview" class="relative w-full h-48 rounded-lg overflow-hidden border border-$c-divider group">
+              <img :src="imagePreview" class="w-full h-full object-cover" />
+              <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                <NButton type="button" btn="solid-error" size="sm" leading="i-ph-trash" @click="removeImage">
+                  移除图片
+                </NButton>
+              </div>
+              <div v-if="isAnalyzing" class="absolute inset-0 bg-black/50 flex items-center justify-center">
+                <span class="i-ph-spinner-gap text-3xl text-white animate-spin" />
+              </div>
+            </div>
+            
+            <!-- AI Tags Display -->
+            <div v-if="imageTags.length > 0" class="flex flex-wrap gap-2">
+              <NBadge v-for="tag in imageTags" :key="tag" badge="soft-primary" leading="i-ph-tag-simple">
+                {{ tag }}
+              </NBadge>
             </div>
           </div>
+        </div>
 
-          <!-- Contact -->
-          <div class="form-control w-full">
-            <label class="label">
-              <span class="label-text">联系方式</span>
-            </label>
-            <div class="relative">
-              <input 
-                v-model="form.contactInfo"
-                type="text"
-                placeholder="手机号或微信"
-                class="input input-bordered w-full pl-10"
-              />
-              <span class="i-ph-phone absolute left-3 top-3 text-xl opacity-50" />
-            </div>
-          </div>
 
-          <!-- Submit -->
-          <div class="pt-4">
-            <button 
-              type="submit" 
-              class="btn btn-primary w-full btn-lg"
-              :class="{ 'loading': isSubmitting }"
-              :disabled="isSubmitting || !session?.user"
-            >
-              {{ isSubmitting ? '发布中...' : '立即发布' }}
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
+        <!-- Title -->
+        <div class="space-y-2">
+          <NLabel for="title">标题 <span class="text-red-500">*</span></NLabel>
+          <NInput 
+            id="title"
+            v-model="form.title" 
+            type="text" 
+            :placeholder="titlePlaceholder" 
+            size="lg"
+          />
+        </div>
+
+        <!-- Category -->
+        <div class="space-y-2">
+          <NLabel for="category">分类</NLabel>
+          <NSelect 
+            id="category"
+            v-model="form.categoryId"
+            :items="categoryItems"
+            placeholder="选择物品分类"
+          />
+        </div>
+
+        <!-- Content -->
+        <div class="space-y-2">
+          <NLabel for="content">详细描述 <span class="text-red-500">*</span></NLabel>
+          <NInput 
+            id="content"
+            v-model="form.content"
+            type="textarea"
+            :placeholder="contentPlaceholder"
+            :rows="4"
+          />
+        </div>
+
+        <!-- Location -->
+        <div class="space-y-2">
+          <NLabel for="location">地点</NLabel>
+          <NInput 
+            id="location"
+            v-model="form.location"
+            type="text"
+            placeholder="例如：图书馆三楼"
+            leading="i-ph-map-pin"
+          />
+        </div>
+
+        <!-- Contact -->
+        <div class="space-y-2">
+          <NLabel for="contact">联系方式</NLabel>
+          <NInput 
+            id="contact"
+            v-model="form.contactInfo"
+            type="text"
+            placeholder="手机号或微信"
+            leading="i-ph-phone"
+          />
+        </div>
+
+        <!-- Submit -->
+        <div class="pt-4">
+          <NButton 
+            type="submit" 
+            btn="solid-primary"
+            block
+            size="lg"
+            :loading="isSubmitting"
+            :disabled="isSubmitting || !session?.user"
+          >
+            {{ isSubmitting ? '发布中...' : '立即发布' }}
+          </NButton>
+        </div>
+      </form>
+    </NCard>
   </div>
 </template>

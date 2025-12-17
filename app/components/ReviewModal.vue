@@ -39,7 +39,7 @@ async function submitReview() {
     toast({
       title: '评价失败',
       description: e.data?.message || '未知错误',
-      toast: 'soft-red',
+      toast: 'soft-error',
       leading: 'i-ph-warning-circle-bold',
       closable: true
     })
@@ -50,46 +50,54 @@ async function submitReview() {
 </script>
 
 <template>
-  <div class="modal" :class="{ 'modal-open': show }">
-    <div class="modal-box">
-      <h3 class="font-bold text-lg mb-4">📝 评价交易体验</h3>
-      
-      <div class="flex flex-col gap-4">
-        <div class="flex flex-col gap-2">
-          <label class="text-sm font-medium opacity-70">评分</label>
-          <div class="rating rating-lg gap-1">
-            <input 
-              v-for="i in 5" 
-              :key="i" 
-              type="radio" 
-              name="rating-2" 
-              class="mask mask-star-2 bg-orange-400" 
-              :checked="i === rating"
-              @click="rating = i" 
-            />
-          </div>
-        </div>
-
-        <div class="flex flex-col gap-2">
-           <label class="text-sm font-medium opacity-70">评价内容</label>
-           <textarea 
-             v-model="comment"
-             class="textarea textarea-bordered w-full h-24"
-             placeholder="写下您对本次交易的感受..."
-           ></textarea>
+  <NDialog 
+    :open="show"
+    title="📝 评价交易体验"
+    @update:open="(val) => !val && emit('close')"
+  >
+    <template #trigger>
+      <span />
+    </template>
+    
+    <div class="flex flex-col gap-4 mt-4">
+      <div class="flex flex-col gap-2">
+        <NLabel>评分</NLabel>
+        <div class="flex gap-2">
+          <button 
+            v-for="i in 5" 
+            :key="i"
+            type="button"
+            class="text-3xl transition-transform hover:scale-110"
+            :class="i <= rating ? 'text-orange-400' : 'text-gray-300'"
+            @click="rating = i"
+          >
+            <span :class="i <= rating ? 'i-ph-star-fill' : 'i-ph-star'" />
+          </button>
         </div>
       </div>
 
-      <div class="modal-action">
-        <button class="btn btn-ghost" @click="emit('close')">取消</button>
-        <button 
-          class="btn btn-primary" 
-          :class="{ 'loading': isSubmitting }"
+      <div class="flex flex-col gap-2">
+        <NLabel>评价内容</NLabel>
+        <NInput 
+          v-model="comment"
+          type="textarea"
+          :rows="3"
+          placeholder="写下您对本次交易的感受..."
+        />
+      </div>
+    </div>
+
+    <template #footer>
+      <div class="flex gap-2 justify-end">
+        <NButton btn="ghost" @click="emit('close')">取消</NButton>
+        <NButton 
+          btn="solid-primary" 
+          :loading="isSubmitting"
           @click="submitReview"
         >
           提交评价
-        </button>
+        </NButton>
       </div>
-    </div>
-  </div>
+    </template>
+  </NDialog>
 </template>

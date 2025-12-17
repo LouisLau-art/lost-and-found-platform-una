@@ -1,36 +1,22 @@
-import {
-    defineConfig,
-    presetUno,
-    presetIcons,
-    presetTypography,
-    presetWebFonts,
-    transformerDirectives,
-    transformerVariantGroup,
-} from 'unocss'
-import { presetDaisy } from '@ameinhardt/unocss-preset-daisy'
+import { defaultConfig } from '@una-ui/nuxt/una.config'
 
+export default defaultConfig({
+    /**
+     * UnoCSS Configuration Options
+     * Extending the default Una UI configuration
+     */
 
-export default defineConfig({
-    presets: [
-        presetUno(),
-        presetDaisy({
-            themes: ['light', 'dark', 'cupcake', 'emerald', 'corporate', 'synthwave', 'cyberpunk', 'valentine', 'halloween', 'garden', 'forest', 'aqua', 'lofi', 'pastel', 'fantasy', 'wireframe', 'black', 'luxury', 'dracula', 'cmyk', 'autumn', 'business', 'acid', 'lemonade', 'night', 'coffee', 'winter', 'dim', 'nord', 'sunset'],
-            rtl: false,
-        }),
-        presetIcons({
-            scale: 1.2,
-            cdn: 'https://esm.sh/',
-        }),
-        presetTypography(),
-        presetWebFonts({
-            fonts: {
-                sans: 'Inter',
-                mono: 'DM Mono',
-            },
-        }),
-    ],
-    transformers: [
-        transformerDirectives(),
-        transformerVariantGroup(),
+    // Include icon presets
+    presets: [],
+
+    shortcuts: [
+        /**
+         * Static Shortcuts for custom utilities
+         */
+        {
+            // Keep font configurations
+            'font-sans': 'font-[Inter]',
+            'font-mono': 'font-[DM_Mono]',
+        },
     ],
 })

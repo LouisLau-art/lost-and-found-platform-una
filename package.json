@@ -1,5 +1,5 @@
 {
-    "name": "lost-and-found-nuxt",
+    "name": "lost-and-found-una",
     "version": "1.0.0",
     "private": true,
     "type": "module",
@@ -14,26 +14,26 @@
         "db:studio": "drizzle-kit studio"
     },
     "dependencies": {
-        "@ameinhardt/unocss-preset-daisy": "1.1.8",
+        "nuxt": "^4.2.2",
+        "vue": "^3.5.25",
+        "better-sqlite3": "^12.5.0",
+        "drizzle-orm": "^0.45.1",
+        "nuxt-auth-utils": "^0.5.26",
         "@xenova/transformers": "latest",
-        "bcrypt": "latest",
-        "better-sqlite3": "latest",
-        "daisyui": "4.12.24",
-        "drizzle-orm": "latest",
-        "nuxt": "latest",
-        "nuxt-auth-utils": "latest",
         "sharp": "^0.34.5"
     },
     "devDependencies": {
+        "@iconify-json/carbon": "^1.2.15",
         "@iconify-json/lucide": "^1.2.81",
         "@iconify-json/ph": "latest",
+        "@iconify-json/radix-icons": "^1.2.5",
         "@iconify-json/tabler": "^1.2.24",
-        "@types/bcrypt": "latest",
-        "@types/better-sqlite3": "latest",
-        "@unocss/nuxt": "^66.5.10",
-        "@unocss/reset": "^66.5.10",
-        "drizzle-kit": "latest",
-        "typescript": "latest",
+        "@nuxt/devtools": "^3.1.1",
+        "@types/better-sqlite3": "^7.6.13",
+        "@una-ui/nuxt": "^1.0.0-alpha.12",
+        "@unocss/preset-icons": "^66.5.10",
+        "drizzle-kit": "^0.31.8",
+        "typescript": "^5.9.3",
         "vue-tsc": "latest"
     }
 }

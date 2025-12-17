@@ -33,3 +33,5 @@ Thumbs.db
 # Lock files (optional, can be tracked if needed)
 # bun.lock
 # package-lock.json
+unadocs/
+3.components/
