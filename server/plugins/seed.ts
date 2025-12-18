@@ -1,7 +1,7 @@
 // This script runs via Node.js during Nuxt dev/build to seed the database
 // using the same password hashing as the main application
 
-import { db, users, categories, posts } from '../server/database'
+import { db, users, categories, posts } from '../database'
 import { eq } from 'drizzle-orm'
 import crypto from 'crypto'
 

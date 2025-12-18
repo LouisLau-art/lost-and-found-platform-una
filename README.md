@@ -6,6 +6,7 @@
 [![DaisyUI](https://img.shields.io/badge/DaisyUI-4.0-5A0EF8?logo=daisyui&logoColor=white)](https://daisyui.com/)
 [![Drizzle ORM](https://img.shields.io/badge/Drizzle-ORM-C5F74F?logo=drizzle&logoColor=black)](https://orm.drizzle.team/)
 [![Transformers.js](https://img.shields.io/badge/AI-Transformers.js-FFD21E?logo=huggingface&logoColor=black)](https://huggingface.co/docs/transformers.js)
+[![Vitest](https://img.shields.io/badge/Tested_with-Vitest-6E9F18?logo=vitest&logoColor=white)](https://vitest.dev/)
 
 针对现代校园场景重构的智能失物招领平台。摒弃了传统的表单填写模式，采用 **AI 图像识别** 和 **向量语义搜索** 技术，让"寻物"和"归还"变得前所未有的简单。
 
@@ -33,6 +34,7 @@
 *   **UI 系统**：DaisyUI + UnoCSS
 *   **数据库**：SQLite + [Drizzle ORM](https://orm.drizzle.team)
 *   **身份验证**：`nuxt-auth-utils` (基于 Session 的安全认证)
+*   **测试框架**：[Vitest](https://vitest.dev/) (API 集成测试)
 *   **AI 引擎**：[Transformers.js](https://huggingface.co/docs/transformers.js)
     *   视觉模型：`Xenova/clip-vit-base-patch32`
     *   运行环境：Node.js / Bun (Backend)
@@ -72,6 +74,29 @@ bun run dev
 ⚠️ **首次运行注意**：
 第一次上传图片时，服务器会自动下载 AI 模型（约 300MB）。请确保网络连接正常（已配置国内镜像源，无需梯子）。模型下载后会缓存在 `.cache/huggingface` 目录下。
 
+## 🧪 测试
+
+本项目使用 [Vitest](https://vitest.dev/) 进行 API 集成测试，覆盖核心业务逻辑。
+
+### 运行测试
+
+```bash
+# 终端 1: 启动开发服务器
+bun run dev
+
+# 终端 2: 运行测试
+bun run test:run     # 单次运行
+bun run test         # 监听模式（文件变化自动重跑）
+```
+
+### 测试覆盖范围
+
+| 模块 | 测试文件 | 测试项 |
+|------|----------|--------|
+| **认证** | `tests/api/auth.test.ts` | 用户注册、登录、字段验证、密码验证、重复邮箱检测 |
+| **帖子** | `tests/api/posts.test.ts` | 列表获取、分页、筛选、创建、权限验证、详情获取 |
+| **认领** | `tests/api/claims.test.ts` | 认领创建、重复认领检测、自我认领防护、权限验证 |
+
 ## 🤖 AI 功能说明
 
 本项目使用了 **CLIP (Contrastive Language-Image Pre-Training)** 技术。
@@ -101,10 +126,14 @@ bun run dev
 │   ├── api/                # API 接口定义
 │   ├── database/           # Drizzle Schema & DB 连接
 │   └── utils/              # 服务端工具 (AI引擎, Auth)
+├── tests/                  # 测试文件
+│   └── api/                # API 集成测试
 ├── public/                 # 静态资源
+├── vitest.config.ts        # Vitest 测试配置
 └── uno.config.ts           # UnoCSS/DaisyUI 配置
 ```
 
 ## 📄 许可证
 
 [MIT License](./LICENSE)
+
