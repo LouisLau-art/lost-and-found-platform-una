@@ -158,6 +158,10 @@ bun run test:run     # 单次运行
 bun run test         # 监听模式
 ```
 
+> ⚠️ **重要提示**：如果使用 Bun 作为包管理器，必须使用 `bun run test` 而不是 `bun test`！
+> 
+> 直接运行 `bun test` 会触发 Bun 自带的测试运行器，而不是 Vitest。这是 Vitest 官方文档中特别强调的注意事项。
+
 ## 💡 经验总结
 
 1. **从简单方案开始**：不要一开始就追求完美的测试框架集成，原生 fetch 也能很好地完成 API 测试。

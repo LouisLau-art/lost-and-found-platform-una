@@ -89,6 +89,8 @@ bun run test:run     # 单次运行
 bun run test         # 监听模式（文件变化自动重跑）
 ```
 
+> ⚠️ **Bun 用户注意**：必须使用 `bun run test` 而不是 `bun test`，否则会触发 Bun 自带的测试运行器而非 Vitest。
+
 ### 测试覆盖范围
 
 | 模块 | 测试文件 | 测试项 |
